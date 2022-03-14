@@ -13,7 +13,6 @@ class PokemonList {
         required this.results,
     });
 
-    dynamic previous;
     List<Result> results;
 
     factory PokemonList.fromJson(Map<String, dynamic> json) => PokemonList(
@@ -21,7 +20,7 @@ class PokemonList {
     );
 
     Map<String, dynamic> toJson() => {
-        "results": List<dynamic>.from(results.map((x) => x.toJson())),
+         "results": List<dynamic>.from(results.map((x) => x.toJson())),
     };
 }
 

@@ -13,6 +13,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  
   PokemonList? pokemons;
   Pokemon? pokemon;
   var isLoaded = false;
@@ -38,12 +39,12 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Teste')
+          title: const Text('Pokémons')
         ),
         body: Visibility(
           visible: isLoaded, 
           child: ListView.builder(
-            itemCount: 10,//pokemons!.results.length,
+            itemCount: pokemons!.results!.length,
             itemBuilder: (context, index){
             return GestureDetector(
               onTap: () => noClique(pokemons!.results[index].url),

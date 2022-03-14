@@ -6,7 +6,7 @@ class RemoteService{
   static Future<PokemonList>? getPokemonsList() async {
     
     var client = http.Client();
-    var uri = Uri.parse('https://pokeapi.co/api/v2/pokemon/');
+    var uri = Uri.parse('https://pokeapi.co/api/v2/pokemon/?offset=0&limit=151');
     var response = await client.get(uri);
     if(response.statusCode == 200){
       var json = response.body;
