@@ -15,16 +15,18 @@ class RemoteService {
     }
   }
 
-  static Future<Pokemon>? getPokemon(var number) async {
+  static Future getPokemon(var number) async {
     var client = http.Client();
     var uri =
         Uri.parse('https://pokeapi.co/api/v2/pokemon/' + number.toString());
-    var response = await client.get(uri);
-    if (response.statusCode == 200) {
-      var json = response.body;
-      return pokemonFromJson(json);
-    } else {
-      return Pokemon(weight: -1, height: -1, id: -1, name: 'noName');
+    dynamic response;
+    try {
+      response = await client.get(uri);
+    } catch (e) {
+      return "erro de conexão com a api";
     }
+
+    var json = response.body;
+    return pokemonFromJson(json);
   }
 }

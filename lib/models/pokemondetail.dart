@@ -5,7 +5,8 @@ import '../services/remote.dart';
 
 class PokemonDetail extends StatefulWidget {
   final String? id;
-  const PokemonDetail({ Key? key, this.id }) : super(key: key);
+  final String? name;
+  const PokemonDetail({Key? key, this.id, this.name}) : super(key: key);
 
   @override
   State<PokemonDetail> createState() => _PokemonDetailState();
@@ -16,53 +17,81 @@ class _PokemonDetailState extends State<PokemonDetail> {
   var isLoaded = false;
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     //fetch data from API
-    getData();
   }
 
-  getData() async{
-    pokemon = await RemoteService.getPokemon(widget.id);
-    if(pokemon != null){
-      setState(() {
-        isLoaded = true;
-      });
-    }
-  }
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      appBar: AppBar(title: Text(pokemon!.name),),
-      body: Visibility(
-          visible: isLoaded, 
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-               Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.center, 
-                children: [
-                Image.network(pokemon!.sprites!.frontDefault),
-                const SizedBox(
-                  height: 10,
-                ),
-                Text('Poke-ID:' + pokemon!.id.toString(),style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),
-                const SizedBox(
-                  height: 10,
-                ),
-                Text('Altura: ' + pokemon!.height.toString(),style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),
-                const SizedBox(
-                  height: 10,
-                ),
-                Text('Peso: ' + pokemon!.weight.toString(),style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),
-              ],)
-          ],   
-      ),
-      replacement: const Center(child: CircularProgressIndicator(),), 
+        appBar: AppBar(
+          title: Text(widget.name.toString()),
+        ),
+        body: FutureBuilder(
+          future: RemoteService.getPokemon(widget.id),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasData) {
+                return mostraPokemon(snapshot.data);
+              } else {
+                return const Text("Erro de conexão");
+              }
+            } else if (snapshot.connectionState == ConnectionState.waiting) {
+              return Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Column(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [const CircularProgressIndicator()])
+                  ]);
+            } else {
+              return const Text("Erro de conexão");
+            }
+          },
+        ));
+  }
+
+  mostraPokemon(Pokemon pokemon) {
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Column(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.network(pokemon.sprites!.frontDefault),
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
+              'Poke-ID:' + pokemon.id.toString(),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
+              'Altura: ' + pokemon.height.toString(),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
+              'Peso: ' + pokemon.weight.toString(),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+          ],
+        )
+      ],
     )
-    );
+        /*replacement: const Center(
+        child: CircularProgressIndicator(),
+      ),*/
+        ;
   }
 }
