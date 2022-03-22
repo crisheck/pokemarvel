@@ -1,23 +1,21 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-//import 'package:pokemarvel/models/pokemon.dart';
+import 'package:pokemarvel/models/pokemonList.dart';
 import 'package:pokemarvel/models/pokemondetail.dart';
 import 'package:pokemarvel/services/remote.dart';
 
-import '../models/pokemonList.dart';
-
-class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+class Pokemon extends StatefulWidget {
+  const Pokemon({Key? key}) : super(key: key);
 
   @override
-  State<Home> createState() => _HomeState();
+  State<Pokemon> createState() => _PokemonState();
 }
 
-class _HomeState extends State<Home> {
+class _PokemonState extends State<Pokemon> {
   final pokeIdValueHolder = TextEditingController();
   PokemonList? pokemons;
-  //Pokemon? pokemon;
+  Pokemon? pokemon;
   var isLoaded = false;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String result = '';
@@ -91,6 +89,27 @@ class _HomeState extends State<Home> {
                     )),
                 const Divider(),
                 Expanded(child: listaPokemon()),
+                Row(
+                  children: [
+                    ElevatedButton(
+                        style: style,
+                        onPressed: () => changePage(1),
+                        child: const Text('Anterior')),
+                    Spacer(),
+                    GestureDetector(
+                        onTap: () {
+                          _showToast();
+                        }, //debugPrint("Gotta Catch 'Em All!"),
+                        child: Image.asset("assets/img/pokeball.png",
+                            width: 50, height: 50)),
+                    Spacer(),
+                    ElevatedButton(
+                        style: style,
+                        onPressed: () => changePage(2),
+                        //onPressed: next,
+                        child: const Text('Próximo'))
+                  ],
+                )
               ],
             ),
           ),
@@ -102,6 +121,33 @@ class _HomeState extends State<Home> {
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => PokemonDetail(id: id, name: name)));
     //print(id);
+  }
+
+  changePage(int op) async {
+    String url = "";
+    if (op == 1) {
+      url = pokemons!.previous.toString();
+    } else {
+      url = pokemons!.next.toString();
+    }
+    if (url != "" && url != "null") {
+      pokemons = await RemoteService.getPokemonsListLink(url);
+      if (pokemons != null) {
+        setState(() {
+          isLoaded = true;
+        });
+      }
+    }
+  }
+
+  next() async {
+    String url = pokemons!.next.toString();
+    pokemons = await RemoteService.getPokemonsListLink(url);
+    if (pokemons != null) {
+      setState(() {
+        isLoaded = true;
+      });
+    }
   }
 
   teste() {
@@ -123,6 +169,12 @@ class _HomeState extends State<Home> {
                       textAlign: TextAlign.center)),
             )));
       },
+    );
+  }
+
+  _showToast() {
+    return ScaffoldMessenger(
+      child: const Text('Added to favorite'),
     );
   }
 }

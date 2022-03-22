@@ -5,13 +5,27 @@ import 'package:http/http.dart' as http;
 class RemoteService {
   static Future<PokemonList>? getPokemonsList() async {
     var client = http.Client();
-    var uri = Uri.parse('https://pokeapi.co/api/v2/pokemon/');
+    var uri = Uri.parse('https://pokeapi.co/api/v2/pokemon');
     var response = await client.get(uri);
     if (response.statusCode == 200) {
       var json = response.body;
       return pokemonListFromJson(json);
     } else {
-      return PokemonList(results: List.empty());
+      return PokemonList(
+          results: List.empty(), count: 0, previous: "", next: "");
+    }
+  }
+
+  static Future<PokemonList>? getPokemonsListLink(String link) async {
+    var client = http.Client();
+    var uri = Uri.parse(link);
+    var response = await client.get(uri);
+    if (response.statusCode == 200) {
+      var json = response.body;
+      return pokemonListFromJson(json);
+    } else {
+      return PokemonList(
+          results: List.empty(), count: 0, previous: "", next: "");
     }
   }
 
